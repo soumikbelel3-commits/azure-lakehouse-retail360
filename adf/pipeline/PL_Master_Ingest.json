@@ -1,0 +1,81 @@
+{
+  "name": "PL_Master_Ingest",
+  "properties": {
+    "description": "Metadata-driven daily ingestion: reads the entity list from the config container, copies each enabled entity in parallel, then triggers the Databricks medallion job.",
+    "parameters": {
+      "windowStart": { "type": "String" },
+      "windowEnd": { "type": "String" },
+      "databricksWorkspaceUrl": { "type": "String", "defaultValue": "https://adb-REPLACE_ME.azuredatabricks.net" },
+      "databricksJobId": { "type": "String", "defaultValue": "0" }
+    },
+    "activities": [
+      {
+        "name": "Lookup Ingestion Config",
+        "type": "Lookup",
+        "policy": { "timeout": "0.00:10:00", "retry": 1, "retryIntervalInSeconds": 30 },
+        "typeProperties": {
+          "source": {
+            "type": "JsonSource",
+            "storeSettings": { "type": "AzureBlobFSReadSettings", "recursive": false }
+          },
+          "dataset": { "referenceName": "DS_Config_Json", "type": "DatasetReference" },
+          "firstRowOnly": false
+        }
+      },
+      {
+        "name": "For Each Entity",
+        "type": "ForEach",
+        "dependsOn": [{ "activity": "Lookup Ingestion Config", "dependencyConditions": ["Succeeded"] }],
+        "typeProperties": {
+          "items": {
+            "value": "@filter(activity('Lookup Ingestion Config').output.value, item().enabled)",
+            "type": "Expression"
+          },
+          "isSequential": false,
+          "batchCount": 5,
+          "activities": [
+            {
+              "name": "Ingest Entity",
+              "type": "ExecutePipeline",
+              "typeProperties": {
+                "pipeline": { "referenceName": "PL_Ingest_Entity", "type": "PipelineReference" },
+                "waitOnCompletion": true,
+                "parameters": {
+                  "entity": "@item().entity",
+                  "schemaName": "@item().schemaName",
+                  "tableName": "@item().tableName",
+                  "watermarkColumn": "@item().watermarkColumn",
+                  "windowStart": "@pipeline().parameters.windowStart",
+                  "windowEnd": "@pipeline().parameters.windowEnd"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Run Databricks Medallion Job",
+        "type": "WebActivity",
+        "dependsOn": [{ "activity": "For Each Entity", "dependencyConditions": ["Succeeded"] }],
+        "policy": { "timeout": "0.00:10:00", "retry": 1, "retryIntervalInSeconds": 60 },
+        "typeProperties": {
+          "url": {
+            "value": "@concat(pipeline().parameters.databricksWorkspaceUrl, '/api/2.1/jobs/run-now')",
+            "type": "Expression"
+          },
+          "method": "POST",
+          "headers": { "Content-Type": "application/json" },
+          "body": {
+            "value": "{\"job_id\": @{pipeline().parameters.databricksJobId}}",
+            "type": "Expression"
+          },
+          "authentication": {
+            "type": "MSI",
+            "resource": "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d"
+          }
+        }
+      }
+    ],
+    "annotations": ["retail360", "orchestration"]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "LS_ADLS_Lakehouse",
+  "properties": {
+    "type": "AzureBlobFS",
+    "description": "ADLS Gen2 lakehouse account, authenticated with the factory's managed identity.",
+    "typeProperties": {
+      "url": "https://__STORAGE_ACCOUNT_NAME__.dfs.core.windows.net"
+    },
+    "connectVia": {
+      "referenceName": "ir-managed-vnet",
+      "type": "IntegrationRuntimeReference"
+    }
+  }
+}

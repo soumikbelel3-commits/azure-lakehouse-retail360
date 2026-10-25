@@ -1,0 +1,15 @@
+{
+  "name": "DS_Config_Json",
+  "properties": {
+    "type": "Json",
+    "linkedServiceName": { "referenceName": "LS_ADLS_Lakehouse", "type": "LinkedServiceReference" },
+    "typeProperties": {
+      "location": {
+        "type": "AzureBlobFSLocation",
+        "fileSystem": "config",
+        "fileName": "ingestion_config.json"
+      }
+    },
+    "schema": {}
+  }
+}

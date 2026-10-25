@@ -1,0 +1,7 @@
+# Copy to backend-prod.hcl (git-ignored) and fill in. State lives in a separate, locked-down
+# storage account created once by hand or by a bootstrap script (see docs/deployment.md).
+resource_group_name  = "rg-tfstate"
+storage_account_name = "sttfstateretail360prod"
+container_name       = "tfstate"
+key                  = "retail360-prod.tfstate"
+use_azuread_auth     = true

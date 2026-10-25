@@ -1,0 +1,58 @@
+{
+  "name": "PL_Ingest_Entity",
+  "properties": {
+    "description": "Copies one ERP table (incrementally when a watermark column is configured) to the landing zone as a dated CSV file.",
+    "parameters": {
+      "entity": { "type": "String" },
+      "schemaName": { "type": "String" },
+      "tableName": { "type": "String" },
+      "watermarkColumn": { "type": "String", "defaultValue": "" },
+      "windowStart": { "type": "String" },
+      "windowEnd": { "type": "String" }
+    },
+    "activities": [
+      {
+        "name": "Copy ERP to Landing",
+        "type": "Copy",
+        "policy": { "timeout": "0.02:00:00", "retry": 2, "retryIntervalInSeconds": 120, "secureOutput": false, "secureInput": false },
+        "typeProperties": {
+          "source": {
+            "type": "SqlServerSource",
+            "queryTimeout": "02:00:00",
+            "sqlReaderQuery": {
+              "value": "@if(empty(pipeline().parameters.watermarkColumn), concat('SELECT * FROM [', pipeline().parameters.schemaName, '].[', pipeline().parameters.tableName, ']'), concat('SELECT * FROM [', pipeline().parameters.schemaName, '].[', pipeline().parameters.tableName, '] WHERE [', pipeline().parameters.watermarkColumn, '] >= ''', pipeline().parameters.windowStart, ''' AND [', pipeline().parameters.watermarkColumn, '] < ''', pipeline().parameters.windowEnd, ''''))",
+              "type": "Expression"
+            }
+          },
+          "sink": {
+            "type": "DelimitedTextSink",
+            "storeSettings": { "type": "AzureBlobFSWriteSettings" },
+            "formatSettings": { "type": "DelimitedTextWriteSettings", "quoteAllText": true, "fileExtension": ".csv" }
+          },
+          "enableStaging": false
+        },
+        "inputs": [
+          {
+            "referenceName": "DS_ERP_Table",
+            "type": "DatasetReference",
+            "parameters": {
+              "schemaName": "@pipeline().parameters.schemaName",
+              "tableName": "@pipeline().parameters.tableName"
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "DS_Landing_Csv",
+            "type": "DatasetReference",
+            "parameters": {
+              "folder": "@concat('erp/', pipeline().parameters.entity)",
+              "fileName": "@concat(pipeline().parameters.entity, '_', formatDateTime(pipeline().parameters.windowStart, 'yyyyMMdd'), '.csv')"
+            }
+          }
+        ]
+      }
+    ],
+    "annotations": ["retail360", "ingestion"]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "DS_Landing_Csv",
+  "properties": {
+    "type": "DelimitedText",
+    "linkedServiceName": { "referenceName": "LS_ADLS_Lakehouse", "type": "LinkedServiceReference" },
+    "parameters": {
+      "folder": { "type": "String" },
+      "fileName": { "type": "String" }
+    },
+    "typeProperties": {
+      "location": {
+        "type": "AzureBlobFSLocation",
+        "fileSystem": "landing",
+        "folderPath": { "value": "@dataset().folder", "type": "Expression" },
+        "fileName": { "value": "@dataset().fileName", "type": "Expression" }
+      },
+      "columnDelimiter": ",",
+      "escapeChar": "\\",
+      "quoteChar": "\"",
+      "firstRowAsHeader": true
+    },
+    "schema": []
+  }
+}

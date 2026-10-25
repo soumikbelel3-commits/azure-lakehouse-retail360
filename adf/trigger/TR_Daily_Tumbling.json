@@ -1,0 +1,23 @@
+{
+  "name": "TR_Daily_Tumbling",
+  "properties": {
+    "description": "One 24h window per day, started one hour after the window closes so late ERP commits are included. Tumbling windows give back-fill and exactly-once window semantics.",
+    "type": "TumblingWindowTrigger",
+    "typeProperties": {
+      "frequency": "Hour",
+      "interval": 24,
+      "startTime": "2026-09-01T00:00:00Z",
+      "delay": "01:00:00",
+      "maxConcurrency": 1,
+      "retryPolicy": { "count": 2, "intervalInSeconds": 600 }
+    },
+    "pipeline": {
+      "pipelineReference": { "referenceName": "PL_Master_Ingest", "type": "PipelineReference" },
+      "parameters": {
+        "windowStart": "@trigger().outputs.windowStartTime",
+        "windowEnd": "@trigger().outputs.windowEndTime"
+      }
+    },
+    "runtimeState": "Stopped"
+  }
+}

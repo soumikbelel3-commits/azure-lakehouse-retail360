@@ -1,0 +1,21 @@
+name: Bug report
+description: Something in the pipelines, infrastructure or docs is wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Include the layer (ingestion, bronze, silver, gold, infra) and any run or error id.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce

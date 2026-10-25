@@ -1,0 +1,22 @@
+{
+  "name": "LS_SqlServer_ERP",
+  "properties": {
+    "type": "SqlServer",
+    "description": "On-premises ERP database, read through the self-hosted integration runtime.",
+    "typeProperties": {
+      "connectionString": "Data Source=__ERP_SQL_HOST__;Initial Catalog=ERP;Integrated Security=False;User ID=svc_adf_reader;Encrypt=True;TrustServerCertificate=False",
+      "password": {
+        "type": "AzureKeyVaultSecret",
+        "store": {
+          "referenceName": "LS_KeyVault",
+          "type": "LinkedServiceReference"
+        },
+        "secretName": "erp-sql-password"
+      }
+    },
+    "connectVia": {
+      "referenceName": "ir-onprem-shir",
+      "type": "IntegrationRuntimeReference"
+    }
+  }
+}

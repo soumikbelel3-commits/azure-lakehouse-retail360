@@ -1,0 +1,7 @@
+store_id,store_name,region,country,city,store_type,open_date
+S001,Retail360 Berlin,EMEA,DE,Berlin,FLAGSHIP,2019-03-01
+S002,Retail360 Paris,EMEA,FR,Paris,STANDARD,2019-03-01
+S003,Retail360 London,EMEA,GB,London,STANDARD,2019-03-01
+S004,Retail360 Mumbai,ROW,IN,Mumbai,FLAGSHIP,2019-03-01
+S005,Retail360 Austin,ROW,US,Austin,STANDARD,2019-03-01
+S006,Retail360 Berlin,EMEA,DE,Berlin,STANDARD,2019-03-01

@@ -1,0 +1,28 @@
+resources:
+  pipelines:
+    retail360_silver:
+      name: retail360-silver-${bundle.target}
+      catalog: ${var.catalog}
+      schema: silver
+      channel: CURRENT
+      continuous: false
+      photon: true
+      libraries:
+        - file:
+            path: ../../pipelines/silver_dlt.py
+        - whl: ../../dist/*.whl
+      configuration:
+        retail360.catalog: ${var.catalog}
+      clusters:
+        - label: default
+          node_type_id: ${var.node_type_id}
+          autoscale:
+            min_workers: 1
+            max_workers: 4
+            mode: ENHANCED
+          azure_attributes:
+            availability: SPOT_WITH_FALLBACK_AZURE
+      notifications:
+        - alerts: [on-update-failure, on-flow-failure]
+          email_recipients:
+            - ${var.alert_email}

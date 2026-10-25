@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "retail360"
+version = "0.1.0"
+description = "Retail 360 lakehouse transformations for Azure Databricks (bronze, silver, gold)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Retail360 Data Engineering" }]
+# pyspark is provided by the Databricks runtime; it is only installed for local development.
+dependencies = []
+
+[project.scripts]
+retail360-bronze = "retail360.jobs.bronze_ingest:main"
+retail360-gold = "retail360.jobs.gold_build:main"
+retail360-dq = "retail360.jobs.dq_report:main"
+
+[project.optional-dependencies]
+dev = [
+  "pyspark>=4.0,<5",
+  "pytest>=8",
+  "pytest-cov>=5",
+  "ruff>=0.6",
+  "pyyaml>=6",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra -q"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests", "scripts", "pipelines"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "N", "C4"]
+ignore = ["N812"]  # `functions as F` is the PySpark convention
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["N802"]
+"scripts/render_architecture.py" = ["E501"]  # long label strings
+
+[tool.coverage.run]
+source = ["src/retail360"]
+omit = ["src/retail360/jobs/*"]

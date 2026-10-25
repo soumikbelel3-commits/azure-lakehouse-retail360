@@ -1,0 +1,61 @@
+# Databricks Asset Bundle: jobs, the Delta Live Tables pipeline and the Python wheel.
+#   databricks bundle validate -t dev
+#   databricks bundle deploy   -t dev
+#   databricks bundle run retail360_daily -t dev
+bundle:
+  name: retail360
+
+include:
+  - databricks/resources/*.yml
+
+artifacts:
+  retail360_wheel:
+    type: whl
+    build: python -m build --wheel
+    path: .
+
+variables:
+  catalog:
+    description: Unity Catalog catalog for this environment.
+  landing_root:
+    description: abfss URI of the landing container (terraform output landing_root).
+  checkpoint_root:
+    description: abfss URI of the checkpoints container (terraform output checkpoint_root).
+  eventhubs_namespace:
+    description: Event Hubs namespace name (terraform output event_hubs_namespace).
+    default: ""
+  alert_email:
+    description: Mailbox notified when a job fails.
+  node_type_id:
+    description: Worker VM size.
+    default: Standard_D4ds_v5
+  spark_version:
+    description: Databricks Runtime (LTS).
+    default: 16.4.x-scala2.12
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-REPLACE_ME.azuredatabricks.net # terraform output databricks_workspace_url
+    variables:
+      catalog: retail360_dev
+      landing_root: abfss://landing@stretail360devREPLACE.dfs.core.windows.net
+      checkpoint_root: abfss://checkpoints@stretail360devREPLACE.dfs.core.windows.net
+      alert_email: data-eng-dev@example.com
+
+  prod:
+    mode: production
+    workspace:
+      host: https://adb-REPLACE_ME.azuredatabricks.net
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    # Deployments run as a service principal, never as a person.
+    run_as:
+      service_principal_name: REPLACE_WITH_SERVICE_PRINCIPAL_APPLICATION_ID
+    variables:
+      catalog: retail360_prod
+      landing_root: abfss://landing@stretail360prodREPLACE.dfs.core.windows.net
+      checkpoint_root: abfss://checkpoints@stretail360prodREPLACE.dfs.core.windows.net
+      alert_email: data-eng-oncall@example.com
+      node_type_id: Standard_D8ds_v5

@@ -1,0 +1,7 @@
+[
+  { "entity": "customers",   "schemaName": "sales", "tableName": "Customers",  "watermarkColumn": "updated_at", "enabled": true },
+  { "entity": "products",    "schemaName": "sales", "tableName": "Products",   "watermarkColumn": "",           "enabled": true },
+  { "entity": "stores",      "schemaName": "sales", "tableName": "Stores",     "watermarkColumn": "",           "enabled": true },
+  { "entity": "orders",      "schemaName": "sales", "tableName": "Orders",     "watermarkColumn": "order_ts",   "enabled": true },
+  { "entity": "order_items", "schemaName": "sales", "tableName": "OrderItems", "watermarkColumn": "order_ts",   "enabled": true }
+]

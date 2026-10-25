@@ -1,0 +1,45 @@
+name: Deploy Databricks bundle
+
+on:
+  push:
+    branches: [main]
+    paths: ["src/**", "pipelines/**", "databricks/**", "databricks.yml", "pyproject.toml"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [dev, prod]
+        default: dev
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Pushes to main promote to dev automatically; prod is a deliberate manual run.
+    environment: ${{ inputs.environment || 'dev' }}
+    env:
+      TARGET: ${{ inputs.environment || 'dev' }}
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      DATABRICKS_AUTH_TYPE: azure-oidc
+      DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: databricks/setup-cli@main
+      - name: Install build tooling and lint
+        run: |
+          pip install build -e ".[dev]"
+          ruff check .
+      - name: Build wheel
+        run: python -m build --wheel
+      - name: Validate bundle
+        run: databricks bundle validate -t "$TARGET"
+      - name: Deploy bundle
+        run: databricks bundle deploy -t "$TARGET"
