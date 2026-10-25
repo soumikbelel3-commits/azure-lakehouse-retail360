@@ -31,7 +31,7 @@ jobs:
         working-directory: infra/terraform
     steps:
       - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.9.8"
       - name: Init
@@ -48,7 +48,7 @@ jobs:
           terraform plan -input=false -out=tfplan \
             -var-file=environments/${{ inputs.environment }}.tfvars \
             -var "subscription_id=${ARM_SUBSCRIPTION_ID}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: tfplan-${{ inputs.environment }}
           path: infra/terraform/tfplan
@@ -69,10 +69,10 @@ jobs:
         working-directory: infra/terraform
     steps:
       - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.9.8"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: tfplan-${{ inputs.environment }}
           path: infra/terraform

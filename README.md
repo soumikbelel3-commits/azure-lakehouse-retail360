@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![PySpark](https://img.shields.io/badge/PySpark-4.x-E25A1C?logo=apachespark&logoColor=white)
-![Terraform](https://img.shields.io/badge/Terraform-azurerm%204.x-7B42BC?logo=terraform&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-azurerm%205.x-7B42BC?logo=terraform&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-ADF%20%7C%20ADLS%20%7C%20Databricks-0078D4?logo=microsoftazure&logoColor=white)
 
 <img src="docs/images/architecture.png" alt="Retail 360 lakehouse architecture on Azure" width="100%">
@@ -70,7 +70,7 @@ Architecture decisions are recorded in [docs/adr](docs/adr).
 | Governance | Unity Catalog (external locations, grants, column masks), Microsoft Purview |
 | Security | Entra ID, managed identities, Key Vault, private endpoints |
 | Observability | Azure Monitor, Log Analytics, metric alerts |
-| IaC and CI/CD | Terraform (azurerm 4.x), Databricks Asset Bundles, GitHub Actions with OIDC |
+| IaC and CI/CD | Terraform (azurerm 5.x), Databricks Asset Bundles, GitHub Actions with OIDC |
 | Quality | pytest, ruff, shared data quality rules |
 
 ## Repository layout
