@@ -28,7 +28,7 @@ jobs:
       DATABRICKS_AUTH_TYPE: azure-oidc
       DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
